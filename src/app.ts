@@ -23,7 +23,7 @@ app.use('/users', usersRoutes);
 app.use('/cards', cardsRoutes);
 
 app.use(errors());
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 app.use((err: CustomError, req: UserRequest, res: Response, next: NextFunction) => {
   const { statusCode = 500, message } = err;
 

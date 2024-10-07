@@ -13,8 +13,7 @@ router.post('/',
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
-      text: Joi.string().required(),
-      owner: Joi.string().hex().length(24)
+      link: Joi.link().required(),
     }),
   }),
   (req: Request, res: Response, next: NextFunction) =>  {

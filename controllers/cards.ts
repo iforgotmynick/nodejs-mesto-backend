@@ -9,7 +9,7 @@ export const createCard = (req: UserRequest, res: Response, next: NextFunction) 
     link: req.body.link,
     owner: req.user!._id,
   })
-    .then((card) => res.send(card))
+    .then((card) => res.status(201).send(card))
     .catch(next);
 };
 
