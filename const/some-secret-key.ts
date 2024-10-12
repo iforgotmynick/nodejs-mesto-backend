@@ -1,0 +1,1 @@
+export const SOME_SECRET_KEY = 'some-secret-key';
