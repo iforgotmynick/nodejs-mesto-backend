@@ -10,11 +10,15 @@ import cookieParser from 'cookie-parser';
 import logger from '../middlewares/logger';
 import errorLogger from '../middlewares/error-logger';
 import expressWinston from 'express-winston';
+import helmet  from 'helmet';
+import { CustomError } from '../interface/custom-error';
+import { NotFoundError } from '../errors/not-found-error';
 
 const app: Express = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(helmet());
 app.use(
   expressWinston.logger({
     winstonInstance: logger,
@@ -23,6 +27,7 @@ app.use(
     expressFormat: true,
   })
 );
+
 app.post('/signin', login);
 app.post('/signup', createUser);
 
@@ -30,18 +35,21 @@ app.use(auth);
 
 app.use('/users', usersRoutes);
 app.use('/cards', cardsRoutes);
+app.use('*', (res, req, next) => {
+  next(new NotFoundError("Запрашиваемый ресурс не найден"))
+});
 
-app.use(errors());
-
-app.use(errorHandler);
 app.use(
   expressWinston.logger({
     winstonInstance: errorLogger,
     meta: true,
-    msg: "{{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms",
+    msg: "{{req.method}}  {{req.url}} {{res.statusCode}} {{res.responseTime}}ms",
     expressFormat: true,
   })
 );
+
+app.use(errors());
+app.use(errorHandler);
 
 app.listen(3000);
 

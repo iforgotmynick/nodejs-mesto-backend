@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import {SOME_SECRET_KEY} from '../const/some-secret-key';
+import {DuplicateError} from '../errors/duplicate-error';
 
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
   const {
@@ -23,7 +24,13 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
       password: hash,
     }))
     .then((user) => res.status(201).send(user))
-    .catch(next);
+    .catch((err) => {
+      if (err.code === 11000) {
+        next(new DuplicateError("Такой пользователь уже зарегистрирован"));
+      } else {
+        next();
+      }
+    });
 };
 
 export const getUsers = (req: Request, res: Response, next: NextFunction) => {
@@ -96,7 +103,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
         maxAge: 1000 * 60 * 60 * 24 * 7,
       });
 
-      res.status(201).send({ token });
+      res.status(200).send({ token });
     })
     .catch(next);
 };

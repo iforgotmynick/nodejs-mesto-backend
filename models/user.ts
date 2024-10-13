@@ -54,6 +54,7 @@ const userSchema = new mongoose.Schema<IUser>(
     toJSON: {
       transform: (doc, ret) => {
         delete ret.__v;
+        delete ret.password;
         return ret;
       },
     },

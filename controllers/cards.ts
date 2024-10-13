@@ -1,6 +1,7 @@
 import Card from "../models/card";
 import { NextFunction, Request, Response } from "express";
 import { NotFoundError } from "../errors/not-found-error";
+import {WrongOwnershipError} from '../errors/wrong-ownership-error';
 
 export const createCard = (req: Request, res: Response, next: NextFunction) => {
   return Card.create({
@@ -19,17 +20,17 @@ export const getCards = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
-  if (req.user !== req.params.owner) {
-    return res.status(403).send({ message: "Нельзя удалить чужую карту" });
-  }
-
-  return Card.findByIdAndDelete(req.params.cardId)
+  return Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError("Нет карты с таким id");
       }
-      res.send(card);
+
+      if (card.owner !== req.user) {
+        throw new WrongOwnershipError("Нельзя удалить чужую карту");
+      }
     })
+    .then(() => Card.findByIdAndDelete(req.params.cardId))
     .catch(next);
 };
 

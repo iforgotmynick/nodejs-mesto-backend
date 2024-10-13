@@ -1,16 +1,13 @@
 import { NextFunction, Response, Request} from 'express';
 import jwt from 'jsonwebtoken';
 import { SOME_SECRET_KEY } from '../const/some-secret-key';
+import {AuthError} from '../errors/auth-error';
 
 const auth = (req: Request, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    res
-      .status(401)
-      .send({ message: 'Необходима авторизация' });
-
-      return;
+    throw new AuthError('Необходима авторизация')
   }
 
   const token = authorization!.replace('Bearer ', '');
@@ -19,11 +16,7 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
   try {
     payload = jwt.verify(token, SOME_SECRET_KEY);
   } catch (err) {
-    res
-      .status(401)
-      .send({ message: 'Необходима авторизация' });
-
-      return;
+    throw new AuthError('Необходима авторизация')
   }
 
   req.user = payload;
