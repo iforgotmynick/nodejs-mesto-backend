@@ -28,7 +28,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
       if (err.code === 11000) {
         next(new DuplicateError("Такой пользователь уже зарегистрирован"));
       } else {
-        next();
+        next(err);
       }
     });
 };

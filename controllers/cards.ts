@@ -26,9 +26,11 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
         throw new NotFoundError("Нет карты с таким id");
       }
 
-      if (card.owner !== req.user) {
+      if (card.owner.toString() === req.user._id) {
         throw new WrongOwnershipError("Нельзя удалить чужую карту");
       }
+
+      return;
     })
     .then(() => Card.findByIdAndDelete(req.params.cardId))
     .catch(next);
